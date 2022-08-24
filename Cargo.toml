@@ -1,0 +1,15 @@
+[package]
+name = "bcp-rs"
+version = "0.1.0"
+edition = "2021"
+
+[[test]]
+name = "wright"
+path = "src/test.rs"
+harness = false
+
+[dependencies]
+rug = "1.17"
+
+[dev-dependencies]
+wright = { git = "https://github.com/CoBrooks/wright" }
