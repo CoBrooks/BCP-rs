@@ -1,14 +1,13 @@
+use num_bigint::BigUint;
+use num_traits::FromPrimitive;
 use wright::*;
 
 fn main() {
     describe("Bcp", || {
         use bcp_rs::{ Bcp, KeyPair };
-        use rug::rand::RandState;
 
         describe("::new(bitsize)", || {
-            let mut rng = RandState::new();
-
-            let bcp = Bcp::new(16, &mut rng);
+            let bcp = Bcp::new(16);
 
             it("should initialize a new Bcp", || {
                 expect(&bcp).to().be().ok()
@@ -16,15 +15,17 @@ fn main() {
 
             let bcp = bcp.unwrap();
 
-            let key1 = bcp.gen_key(&mut rng);
-            let key2 = bcp.gen_key(&mut rng);
+            let key1 = bcp.gen_key();
+            let key2 = bcp.gen_key();
 
             describe(".gen_key()", || {
                 it("should return a public-private key pair", || {
                     let KeyPair { public, private } = key1.clone();
 
-                    !expect(&public).to().equal(0)
-                        && !expect(&private).to().equal(0)
+                    let zero = BigUint::from_u8(0).unwrap();
+
+                    !expect(&public).to().equal(zero.clone())
+                        && !expect(&private).to().equal(zero)
                 });
 
                 it("should not generate duplicate key pairs", || {
@@ -39,13 +40,13 @@ fn main() {
 
             const DATA: u32 = 100;
 
-            let ciphertext = bcp.encrypt(DATA, &key1.public, &mut rng);
+            let ciphertext = bcp.encrypt(DATA, &key1.public);
 
             describe(".encrypt(plaintext, pk)", || {
                 it("should return encrypted plaintext", || {
                     let (a, b) = ciphertext.clone();
 
-                    a > 0 && b > 0
+                    a > 0u32.into() && b > 0u32.into()
                 });
             });
 
@@ -64,16 +65,16 @@ fn main() {
                 });
             });
 
-            describe(".decrypt_with_mk(ciphertext)", || {
+            describe(".decrypt_with_mk(ciphertext, public_key)", || {
                 it("should decrypt ciphertext encrypted with pk", || {
-                    let ciphertext = bcp.encrypt(DATA, &key1.public, &mut rng.clone());
+                    let ciphertext = bcp.encrypt(DATA, &key1.public);
                     let decrypted = bcp.decrypt_mk(ciphertext, &key1.public);
 
                     expect(&decrypted).to().equal(DATA)
                 });
                 
                 it("should decrypt ciphertext encrypted with sk", || {
-                    let ciphertext = bcp.encrypt(DATA, &key2.public, &mut rng.clone());
+                    let ciphertext = bcp.encrypt(DATA, &key2.public);
                     let decrypted = bcp.decrypt_mk(ciphertext, &key2.public);
 
                     expect(&decrypted).to().equal(DATA)
