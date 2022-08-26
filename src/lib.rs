@@ -1,5 +1,6 @@
 use num_bigint::{RandBigInt, BigUint};
-use num_traits::{Pow, FromPrimitive};
+use num_integer::Integer;
+use num_traits::Pow;
 use num_modular::ModularUnaryOps;
 use num_primes::Generator;
 use rand::thread_rng;
@@ -46,7 +47,7 @@ pub struct Bcp {
 }
 
 impl Bcp {
-    pub fn new(bitsize: usize) -> Result<Self, Error> {
+    pub fn new(bitsize: usize) -> Self {
         let p: BigUint = to_num_biguint(Generator::safe_prime(bitsize));
         let q: BigUint = to_num_biguint(Generator::safe_prime(bitsize));
         
@@ -56,74 +57,23 @@ impl Bcp {
         let n = p.clone() * q.clone();
         let n2 = n.clone().pow(2u32);
 
-        let g = Self::get_g(&p, &pp, &q, &qq, &n2);
+        let mut alpha = thread_rng().gen_biguint_below(&n2);
+        // Only happens if alpha divides by n
+        while alpha.gcd(&n2) != 1u32.into() {
+            alpha = thread_rng().gen_biguint_below(&n2);
+        }
+
+        let g = alpha.modpow(&2u32.into(), &n2);
+
         let k = g.modpow(&(&pp * &qq), &n2) / n.clone();
         
         let mk = pp * qq;
         
-        let bcp = Self { 
+        Self { 
             bitsize,
             n, k, g,
             mk,
             p, q, n2
-        };
-
-        Ok(bcp)
-    }
-
-    fn get_g(p: &BigUint, pp: &BigUint, qq: &BigUint, q: &BigUint, n2: &BigUint) -> BigUint {
-        let one: BigUint = BigUint::from_u32(1).unwrap();
-
-        let mut g: BigUint;
-        loop {
-            g = thread_rng().gen_biguint_below(n2);
-            g = (g - 1u32).modpow(&2u32.into(), n2);
-
-            if g == one { continue; }
-
-            let tmp = g.clone().modpow(p, n2);
-            if tmp == one { continue; }
-
-            let tmp = g.clone().modpow(pp, n2);
-            if tmp == one { continue; }
-
-            let tmp = g.clone().modpow(q, n2);
-            if tmp == one { continue; }
-            
-            let tmp = g.clone().modpow(qq, n2);
-            if tmp == one { continue; }
-            
-            let tmp = g.clone().modpow(&(p * pp), n2);
-            if tmp == one { continue; }
-            
-            let tmp = g.clone().modpow(&(p * q), n2);
-            if tmp == one { continue; }
-            
-            let tmp = g.clone().modpow(&(p * qq), n2);
-            if tmp == one { continue; }
-            
-            let tmp = g.clone().modpow(&(pp * q), n2);
-            if tmp == one { continue; }
-            
-            let tmp = g.clone().modpow(&(pp * qq), n2);
-            if tmp == one { continue; }
-            
-            let tmp = g.clone().modpow(&(q * qq), n2);
-            if tmp == one { continue; }
-
-            let p_pp: BigUint = p * pp;
-            let q_qq: BigUint = q * qq;
-            
-            let tmp = g.clone().modpow(&(p_pp * qq), n2);
-            if tmp == one { continue; }
-            
-            let tmp = g.clone().modpow(&(p * &q_qq), n2);
-            if tmp == one { continue; }
-            
-            let tmp = g.clone().modpow(&(pp * q_qq), n2);
-            if tmp == one { continue; }
-
-            break g;
         }
     }
 

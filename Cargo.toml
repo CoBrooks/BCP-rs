@@ -10,6 +10,7 @@ harness = false
 
 [dependencies]
 num-bigint = { version = "0.4", features = ["rand"] }
+num-integer = "0.1"
 num-traits = "0.2"
 num-primes = "0.3"
 num-modular = { version = "0.5", features = ["num-bigint"] }

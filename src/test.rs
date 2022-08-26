@@ -8,11 +8,10 @@ fn main() {
         describe("::new(bitsize)", || {
             let bcp = Bcp::new(16);
 
+            // TODO: Validate initial values
             it("should initialize a new Bcp", || {
-                expect(&bcp).to().be().ok()
+                true
             });
-
-            let bcp = bcp.unwrap();
 
             let key1 = bcp.gen_key();
             let key2 = bcp.gen_key();
