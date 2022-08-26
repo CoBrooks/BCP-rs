@@ -10,6 +10,8 @@ Computation under Multiple Keys*
 
 ## Testing
 
+Uses my BDD testing library - [Wright](https://github.com/CoBrooks/wright).
+
 ```bash
 $ git clone https://github.com/CoBrooks/BCP-rs.git
 $ cd BCP-rs
