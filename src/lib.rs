@@ -131,16 +131,12 @@ impl Bcp {
 
         let gamma = (a * r) % &self.n;
 
-        let mut tmp3 = self.g.clone().invm(&self.n2).unwrap()
+        let inv_g_pow_gamma = self.g.clone().invm(&self.n2).unwrap()
             .modpow(&gamma, &self.n2);
 
-        tmp3 *= ciphertext.1;
-        tmp3 = tmp3.modpow(&self.mk, &self.n2);
-        tmp3 -= 1u32;
-        tmp3 /= &self.n;
-        tmp3 *= inv_mk;
+        let numerator = (ciphertext.1 * inv_g_pow_gamma).modpow(&self.mk, &self.n2) - 1u32;
 
-        tmp3 % &self.n
+        (numerator / &self.n * inv_mk) % &self.n
     }
 
     pub fn encrypt_str(&self, plaintext: &str, public_key: &PublicKey) -> String {
