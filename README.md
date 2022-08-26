@@ -13,15 +13,11 @@ Computation under Multiple Keys*
 Uses my BDD testing library - [Wright](https://github.com/CoBrooks/wright).
 
 ```bash
-$ git clone https://github.com/CoBrooks/BCP-rs.git
-$ cd BCP-rs
 $ cargo test -q wright
 ```
 
 ## Benchmarks
 
 ```bash
-$ git clone https://github.com/CoBrooks/BCP-rs.git
-$ cd BCP-rs
 $ cargo bench
 ```
