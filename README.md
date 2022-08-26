@@ -8,23 +8,20 @@ and further described by *Efficiently Outsourcing Multiparty
 Computation under Multiple Keys*
 ([Peter, Tews, and Katzenbeisser, pg. 5](https://eprint.iacr.org/2013/013.pdf#page=5)).
 
-## Running
-
-```bash
-$ git clone https://github.com/CoBrooks/BCP-rs.git
-$ cd BCP-rs
-```
-
-### Testing
+## Testing
 
 Uses my BDD testing library - [Wright](https://github.com/CoBrooks/wright).
 
 ```bash
+$ git clone https://github.com/CoBrooks/BCP-rs.git
+$ cd BCP-rs
 $ cargo test -q wright
 ```
 
-### Benchmarks
+## Benchmarks
 
 ```bash
+$ git clone https://github.com/CoBrooks/BCP-rs.git
+$ cd BCP-rs
 $ cargo bench
 ```
