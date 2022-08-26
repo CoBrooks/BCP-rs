@@ -6,7 +6,7 @@ fn main() {
         use bcp_rs::{ Bcp, KeyPair };
 
         describe("::new(bitsize)", || {
-            let bcp = Bcp::new(16);
+            let bcp = Bcp::new(512);
 
             // TODO: Validate initial values
             it("should initialize a new Bcp", || {

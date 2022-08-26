@@ -2,14 +2,8 @@ use num_bigint::{RandBigInt, BigUint};
 use num_integer::Integer;
 use num_traits::Pow;
 use num_modular::ModularUnaryOps;
-use num_primes::Generator;
+use num_prime::RandPrime;
 use rand::thread_rng;
-
-fn to_num_biguint(primes_biguint: num_primes::BigUint) -> BigUint {
-    let bytes = primes_biguint.to_bytes_be();
-
-    BigUint::from_bytes_be(&bytes)
-}
 
 #[derive(Debug)]
 pub enum Error {
@@ -48,17 +42,17 @@ pub struct Bcp {
 
 impl Bcp {
     pub fn new(bitsize: usize) -> Self {
-        let p: BigUint = to_num_biguint(Generator::safe_prime(bitsize));
-        let q: BigUint = to_num_biguint(Generator::safe_prime(bitsize));
-        
-        let pp: BigUint = (p.clone() - 1u32) / 2u32;
-        let qq: BigUint = (q.clone() - 1u32) / 2u32;
+        let p: BigUint = thread_rng().gen_safe_prime_exact(bitsize);
+        let q: BigUint = thread_rng().gen_safe_prime_exact(bitsize);
 
+        let pp: BigUint = (&p - 1u32) / 2u32;
+        let qq: BigUint = (&q - 1u32) / 2u32;
+        
         let n = p.clone() * q.clone();
         let n2 = n.clone().pow(2u32);
 
         let mut alpha = thread_rng().gen_biguint_below(&n2);
-        // Only happens if alpha divides by n
+        // Only happens if alpha divides by n, p, or q
         while alpha.gcd(&n2) != 1u32.into() {
             alpha = thread_rng().gen_biguint_below(&n2);
         }
