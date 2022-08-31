@@ -21,3 +21,7 @@ $ cargo test -q wright
 ```bash
 $ cargo bench
 ```
+
+## WASM
+
+See [the WASM example](./WASM-example).

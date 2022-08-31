@@ -1,7 +1,8 @@
 # BCP-rs/WASM-example
 
-BCP-rs can be compiled into the WASM format, allowing it to be 
-use from within a JavaScript or TypeScript application.
+BCP-rs can be compiled into WASM code, allowing it to be
+used from within a JavaScript or TypeScript application.
+See [index.js](./index.js) for example JS code.
 
 ## Usage
 
