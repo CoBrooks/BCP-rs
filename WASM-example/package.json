@@ -1,0 +1,10 @@
+{
+  "name": "wasm-example",
+  "version": "0.0.1",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "wasm-pack build --target nodejs --features wasm",
+    "start": "node index.js"
+  }
+}

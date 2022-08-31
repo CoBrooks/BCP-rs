@@ -3,6 +3,15 @@ name = "bcp-rs"
 version = "0.1.0"
 edition = "2021"
 
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
+[features]
+wasm = ["dep:wasm-bindgen", "dep:getrandom"]
+
+[lib]
+crate-type = ["cdylib"]
+
 [[test]]
 name = "wright"
 path = "src/test.rs"
@@ -21,6 +30,9 @@ num-prime = "0.4"
 num-modular = { version = "0.5", features = ["num-bigint"] }
 rand = "0.8"
 rand_chacha = "0.3"
+base64 = "0.13"
+wasm-bindgen = { version = "0.2", optional = true }
+getrandom = { version = "0.2", optional = true, features = ["js"] }
 
 [profile.dev.package."*"]
 opt-level = 3

@@ -8,6 +8,9 @@ use rand::SeedableRng;
 use rand::rngs::adapter::ReseedingRng;
 use rand_chacha::ChaCha20Core;
 
+#[cfg(feature = "wasm")]
+pub mod wasm;
+
 #[derive(Debug)]
 pub enum Error {
     Unimplemented
@@ -25,22 +28,32 @@ pub struct KeyPair {
     pub private: PrivateKey
 }
 
+impl KeyPair {
+    pub fn base64_encoded(&self) -> (String, String) {
+        let PublicKey(pk) = &self.public;
+        let PrivateKey(sk) = &self.private;
+
+        (
+            base64::encode(pk.to_bytes_be()),
+            base64::encode(sk.to_bytes_be()),
+        )
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct Ciphertext(BigUint, BigUint);
 
 #[derive(Clone, Debug)]
 pub struct Bcp {
-    pub bitsize: usize,
+    bitsize: usize,
 
-    pub n: BigUint,
-    pub k: BigUint,
-    pub g: BigUint,
+    n: BigUint,
+    k: BigUint,
+    g: BigUint,
     
-    pub mk: BigUint,
+    mk: BigUint,
     
-    pub p: BigUint,
-    pub q: BigUint,
-    pub n2: BigUint,
+    n2: BigUint,
 }
 
 impl Bcp {
@@ -58,7 +71,7 @@ impl Bcp {
         let pp: BigUint = (&p - 1u32) / 2u32;
         let qq: BigUint = (&q - 1u32) / 2u32;
         
-        let n = p.clone() * q.clone();
+        let n = p * q;
         let n2 = n.clone().pow(2u32);
 
         let mut alpha = rng.gen_biguint_below(&n2);
@@ -77,7 +90,7 @@ impl Bcp {
             bitsize,
             n, k, g,
             mk,
-            p, q, n2
+            n2
         }
     }
 
