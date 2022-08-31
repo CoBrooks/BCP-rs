@@ -3,7 +3,10 @@ use num_integer::Integer;
 use num_traits::Pow;
 use num_modular::ModularUnaryOps;
 use num_prime::RandPrime;
-use rand::thread_rng;
+use rand::rngs::OsRng;
+use rand::SeedableRng;
+use rand::rngs::adapter::ReseedingRng;
+use rand_chacha::ChaCha20Core;
 
 #[derive(Debug)]
 pub enum Error {
@@ -41,9 +44,16 @@ pub struct Bcp {
 }
 
 impl Bcp {
+    fn get_rng() -> ReseedingRng<ChaCha20Core, OsRng> {
+        let prng = ChaCha20Core::from_entropy();
+        ReseedingRng::new(prng, 0, OsRng)
+    }
+
     pub fn new(bitsize: usize) -> Self {
-        let p: BigUint = thread_rng().gen_safe_prime_exact(bitsize);
-        let q: BigUint = thread_rng().gen_safe_prime_exact(bitsize);
+        let mut rng = Self::get_rng();
+
+        let p: BigUint = rng.gen_safe_prime_exact(bitsize);
+        let q: BigUint = rng.gen_safe_prime_exact(bitsize);
 
         let pp: BigUint = (&p - 1u32) / 2u32;
         let qq: BigUint = (&q - 1u32) / 2u32;
@@ -51,10 +61,10 @@ impl Bcp {
         let n = p.clone() * q.clone();
         let n2 = n.clone().pow(2u32);
 
-        let mut alpha = thread_rng().gen_biguint_below(&n2);
+        let mut alpha = rng.gen_biguint_below(&n2);
         // Only happens if alpha divides by n, p, or q
         while alpha.gcd(&n2) != 1u32.into() {
-            alpha = thread_rng().gen_biguint_below(&n2);
+            alpha = rng.gen_biguint_below(&n2);
         }
 
         let g = alpha.modpow(&2u32.into(), &n2);
@@ -72,8 +82,10 @@ impl Bcp {
     }
 
     pub fn gen_key(&self) -> KeyPair {
+        let mut rng = Self::get_rng();
+
         let a_range: BigUint = &self.n2 / 2u32;
-        let a: BigUint = thread_rng().gen_biguint_below(&a_range);
+        let a: BigUint = rng.gen_biguint_below(&a_range);
 
         let h = self.g.modpow(&a, &self.n2);
 
@@ -86,9 +98,11 @@ impl Bcp {
     pub fn encrypt(&self, m: BigUint, public_key: &PublicKey) -> Ciphertext {
         assert!(m < self.n);
 
+        let mut rng = Self::get_rng();
+
         let PublicKey(pk) = public_key;
 
-        let r: BigUint = thread_rng().gen_biguint_below(&self.n2);
+        let r: BigUint = rng.gen_biguint_below(&self.n2);
 
         let a = self.g.modpow(&r, &self.n2);
         
